@@ -21,6 +21,13 @@ public class SudokuSolver implements ISudokuSolver {
 		D = new ArrayList<ArrayList<Integer>>(size*size*size*size);
 		
 		//Initialize each D[X]...
+		for (int i = 0; i < size * size * size * size; i++) {
+			ArrayList<Integer> domain = new ArrayList<>();
+			for (int v = 1; v <= size * size; v++) {
+				domain.add(v);
+			}
+			D.add(domain);
+		}
 		
 	}
 
