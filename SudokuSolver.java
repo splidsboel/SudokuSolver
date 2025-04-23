@@ -31,13 +31,21 @@ public class SudokuSolver implements ISudokuSolver {
 		
 	}
 
-
+	@Override
 	public boolean solve() {
 		ArrayList<Integer> asn = GetAssignment(puzzle);
 		
-		//INITIAL_FC
-		//FC
-
+		if (!INITIAL_FC(asn)) {
+			return false;
+		}
+	
+		ArrayList<Integer> solution = FC(asn);
+	
+		if (solution == null) {
+			return false;
+		}
+	
+		this.puzzle = GetPuzzle(solution);
 		return true;
 	}
 
@@ -50,8 +58,51 @@ public class SudokuSolver implements ISudokuSolver {
 		//YOUR TASK:  Implement FC(asn)
 		//---------------------------------------------------------------------------------
 		public ArrayList FC(ArrayList<Integer> asn) {
-	
-			return null;//failure
+			// Base case: If no unassigned variables, solution found
+			if (!asn.contains(0)) {
+				return asn;
+			}
+
+			// Step 1: Get the first unassigned variable X (index of first 0)
+			int X = asn.indexOf(0);
+
+			// Step 2: Make a deep copy of current domains
+			ArrayList<ArrayList<Integer>> Dold = new ArrayList<>();
+			for (ArrayList<Integer> domain : D) {
+				Dold.add(new ArrayList<>(domain));
+			}
+
+			// Step 3: Try each value V in domain of X
+			for (Integer V : D.get(X)) {
+				if (AC_FC(X, V)) {
+					// Step 3.1: Tentatively assign V to X
+					asn.set(X, V);
+
+					// Step 3.2: Recurse
+					ArrayList<Integer> R = FC(asn);
+
+					// Step 3.3: If solution found, return it
+					if (R != null) {
+						return R;
+					}
+
+					// Step 3.4: Backtrack: unassign X, restore D
+					asn.set(X, 0);
+					D = new ArrayList<>();
+					for (ArrayList<Integer> domain : Dold) {
+						D.add(new ArrayList<>(domain));
+					}
+				} else {
+					// Restore D even if AC_FC failed
+					D = new ArrayList<>();
+					for (ArrayList<Integer> domain : Dold) {
+						D.add(new ArrayList<>(domain));
+					}
+				}
+			}
+
+			// Step 4: No value worked for X, return failure
+			return null;
 		}
 
 	
